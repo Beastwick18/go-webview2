@@ -24,7 +24,7 @@ func main() {
 		log.Fatalln("Failed to load webview.")
 	}
 	w.SetSize(384, 654, webview2.HintNone)
-	w.Navigate("https://act.hoyolab.com/app/community-game-records-sea/m.html#/ys/realtime?role_id=611976523&server=os_usa")
+	//w.Navigate("https://act.hoyolab.com/app/community-game-records-sea/m.html#/ys/realtime?role_id=611976523&server=os_usa")
 	w.Run()
 	w.Destroy()
 }
