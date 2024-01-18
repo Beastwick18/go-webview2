@@ -128,6 +128,42 @@ func NewWithOptions(options WebViewOptions) WebView {
 	return w
 }
 
+// NewWithOptions creates a new webview using the provided options.
+func NewWithUserAgent(options WebViewOptions, agent string) WebView {
+	w := &webview{}
+	w.bindings = map[string]interface{}{}
+	w.autofocus = options.AutoFocus
+
+	chromium := edge.NewChromium()
+	chromium.MessageCallback = w.msgcb
+	chromium.DataPath = options.DataPath
+	chromium.SetPermission(edge.CoreWebView2PermissionKindClipboardRead, edge.CoreWebView2PermissionStateAllow)
+
+	w.browser = chromium
+	w.mainthread, _, _ = w32.Kernel32GetCurrentThreadID.Call()
+	if !w.CreateWithOptions(options.WindowOptions) {
+		return nil
+	}
+
+	settings, err := chromium.GetSettings()
+	if err != nil {
+		log.Fatal(err)
+	}
+	settings.PutUserAgent(agent)
+	// disable context menu
+	err = settings.PutAreDefaultContextMenusEnabled(options.Debug)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// disable developer tools
+	err = settings.PutAreDevToolsEnabled(options.Debug)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return w
+}
+
 type rpcMessage struct {
 	ID     int               `json:"id"`
 	Method string            `json:"method"`
